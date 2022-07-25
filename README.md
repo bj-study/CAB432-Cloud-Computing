@@ -1,6 +1,6 @@
-# CAB303 Study Guide | 2022 Semester 2
+# CAB432 Study Guide | 2022 Semester 2
 
-Dr Vicky Liu | Notes for CAB432 at the Queensland University of Technology
+Associate Professor Jim Hogan | Notes for CAB432 at the Queensland University of Technology
 
 ## Disclaimer
 
