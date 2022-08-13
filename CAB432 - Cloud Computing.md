@@ -10,7 +10,7 @@ Associate Professor Jim Hogan | Notes for CAB432 at the Queensland University of
 	<ul>
 		<li><a href="#week1">Week 1</a>: Introduction</li>
 		<li><a href="#week2">Week 2</a>: Docker</li>
-		<li><a href="#week3">Week 3</a>: </li>
+		<li><a href="#week3">Week 3</a>: Cloud Applications, REST, and Node</li>
 		<li><a href="#week4">Week 4</a>: </li>
 		<li><a href="#week5">Week 5</a>: </li>
 		<li><a href="#week6">Week 6</a>: </li>
@@ -195,3 +195,162 @@ There are many pros to this such as:
 - The guest OS does not need to be modified
 
 One of the main cons to this method is that it requires hardware support although this is quite common now days.
+
+<br />
+
+<h2 id="week3">Week 3: Cloud Applications, REST, and Node</h2>
+
+### Moving to the Cloud
+When moving to the cloud it's important to note that virtualisation means latency. The requests and responses that need to be sent and received are no longer free and instant. It's because of this that in cloud computing we must choose our method of data persistance carefully whether that be slow, long-term storage, fast cached storage or others.
+
+Due to each message having an associated "flagfall" and cost associated we generally try to bundle them together when possible.
+
+Another thing to note is that the interactions through the cloud are stateless and asynchronous. We don't always guarantee an immediate response but we do guarantee a response, clients send messages and then await the returning message from the service.
+
+### State and Statelessness
+State is the current state of some object such as the values of it's fields. In the context of cloud computing what we mean when we refer to an objects state is how we can maintain that specific objects state between different server requests.
+
+Statelessness can be a confusing concept due to the reason that there may be some state there, it's just that we don't rely on that state being preserved. An object is stateless initially but the state of that object can be recoverable via some other means.
+
+### REST
+REpresentational State Transfer, or REST for short, is a set of principles that define how web standards, such as HTTP and URIs, are supposed to be used. Using the principles of REST we must:
+- Give everything an Id:
+  - https://www.flickr.com/photos/sdufva
+  - https://www.flickr.com/photos/tags/golden-retrievers
+  - https://www.example.com/orders/2007/11
+  - https://www.example.com/products?colour=green
+- Link things together:
+  - Global URIs allow most unbounded linkage of resources and attributes
+  - URIs can capture state, allowing state transitions to be mapped to link transitions
+- Use standard methods:
+  - HTTP
+  - GET, POST, PUT, DELETE
+- Have resources with multiple representations:
+  - JSON, XML, Plain Text
+- Communicate statelessly:
+  - Keep the state in the URI or in the client
+
+### GET
+A GET request is a HTTP request method used to retrieve data from a data source. An example of a GET request to developer.mozilla.org is:
+
+```
+GET / HTTP/1.1
+Host: developer.mozilla.org
+Accept-Language: en 
+```
+
+After the request is made a response will be transmitted from the host destination, here is an example of a 200 Ok response:
+
+```
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 55743
+[More here...]
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8>
+    <title>A simple webpage</title>
+  </head>
+  <body>
+    <h1>Welcome</h1>
+    <p>Hello, world!</p>
+  </body>
+</html>
+```
+
+### POST
+A POST request is a HTTP method used to send some data to a data source. An example of a POST request is:
+
+```
+POST /users HTTP/1.1
+Accept: application/json
+Authorization: Basic XXXXXXXXXXXXXXXXX
+Content-Type: application/json
+Host: localhost
+Connection: keep-alive
+Content-Length: 984
+
+{
+  "name": "Franklin Schafer",
+  "purchase": {
+    "id": "Bicycle computer",
+    [More here...]
+  }
+  [More here...]
+}
+```
+
+Much like the GET request a response will be transmitted once the server receives the request.
+
+### Cloud Requests
+All these requests first come into the Elastic Load Balancer with those requests then being sent on into the Scaling Pool machines.
+
+### Elements of the HTTP Session
+A HTTP session consists of three phases:
+1. The client establishes a TCP connection
+2. The client sends a request and then waits for an answer
+3. The server processes the requests and sends back an answer containing a status code and the appropriate data
+
+Each request follows the general structure of:
+- Method + Parameters: Path to the resource without the domain name
+- The HTTP protocol version being used
+- Any subsequent headers e.g. Content-Type
+- An empty line above the data block
+
+Each request follows the general structure of:
+- Status line, HTTP version used + the status code and information
+- Additional HTTP headers such as the timestamp, type, data size...
+- The data block (with a blank line above it)
+
+### Common Response Codes:
+
+| Code | Name |
+|--|--|
+| 100 | Continue |
+| 200 | OK |
+| 201 | Created |
+| 202 | Accepted |
+| 301 | Moved Permanently |
+| 400 | Bad Request |
+| 401 | Unauthorized |
+| 403 | Forbidden |
+| 404 | Not Found |
+| 500 | Internal Server Error |
+| 501 | Not Implemented |
+| 502 | Bad Gateway |
+| 503 | Service Unavailable |
+| 504 | Gateway Timeout |
+
+### Node.js
+Node.js is essentially server side JavaScript which was introduced to support rapid server connections and processing. Node.js has many advantages such as:
+- It being fast due to it being compiled and being very optimised
+- Having support for asynchronous javascript connection processing
+- Not having to allocate a new thread for every connection
+- It's open-source
+- Having very strong support from major vendors such as Google, Microsoft and more
+
+An example of a simple Node.js server:
+
+```js
+const http = require("http");
+
+const hostname = "127.0.0.1";
+const port = 3000;
+
+const server = http.createServer((req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "text/plain");
+  res.end("Hello World\n");
+});
+
+server.listen(port, hostname, () => {
+  console.log(`Server running at http://${hostname}:${port}/`);
+});
+```
+
+### Simple Storage Service
+Simple storage service can be thought of as lots of very large objects each containing a collection of <key, Object> pairs. This is based on a non-relational, addressable bucket model and was the original AWS service layer.
+
+It's important to remember that data persistence is up to the vendor you're using and that the data utility is up to you.
