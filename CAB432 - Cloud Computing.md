@@ -11,7 +11,7 @@ Associate Professor Jim Hogan | Notes for CAB432 at the Queensland University of
 		<li><a href="#week1">Week 1</a>: Introduction</li>
 		<li><a href="#week2">Week 2</a>: Docker</li>
 		<li><a href="#week3">Week 3</a>: Cloud Applications, REST, and Node</li>
-		<li><a href="#week4">Week 4</a>: </li>
+		<li><a href="#week4">Week 4</a>: Node and Express</li>
 		<li><a href="#week5">Week 5</a>: </li>
 		<li><a href="#week6">Week 6</a>: </li>
 		<li><a href="#week7">Week 7</a>: </li>
@@ -354,3 +354,157 @@ server.listen(port, hostname, () => {
 Simple storage service can be thought of as lots of very large objects each containing a collection of <key, Object> pairs. This is based on a non-relational, addressable bucket model and was the original AWS service layer.
 
 It's important to remember that data persistence is up to the vendor you're using and that the data utility is up to you.
+
+<br />
+
+<h2 id="week4">Week 4: Node and Express</h2>
+
+### NPM
+NPM is an online repository of open-source Node.js projects. It is also a command-line utility that installs, removes, updates and manages installed npm packages.
+
+To install a package locally we type:
+
+```bash
+npm install <package-name>
+```
+
+and to install the package globally (not recommended unless you know the utility is globally useful)
+
+```bash
+npm install <package-name> -g
+```
+
+These packages will be installed into your projects `node_modules` folder with all package dependencies stored in `package.json` and `package-lock.json`.
+
+### Express
+
+Express is an application framework designed for node. To use Express we must first install it using `npm install express -g`. Let's take a look at a very simple hello world express program:
+
+```js
+const express = require("express");
+const app = express();
+
+const hostname = "127.0.0.1";
+const port = 3000;
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
+server.listen(port, () => {
+  console.log(`Express app listening at http://${hostname}:${port}/`);
+});
+```
+
+We can handle routing using the `Router` class.
+
+```js
+const express = require("express");
+const router = express.Router();
+
+router.get("/", (req, res) => {
+  res.send("Home page");
+});
+
+router.get("/about", (req, res) => {
+  res.send("About page");
+});
+
+module.exports = router;
+```
+
+### Express Generator
+Express generator will create and setup a lot of the necessary boilerplate for an Express application for us. To use it we must first install it using `npm install express-generator -g`. Once installed we can create an Express application using `express helloworld` in the terminal. The following files will be created inside the project directory:
+
+```
+.
+├── app.js
+├── bin
+│   └── www
+├── package.json
+├── public
+│   ├── images
+│   ├── javascripts
+│   └── stylesheets
+│       └── style.css
+├── routes
+│   ├── index.js
+│   └── users.js
+└── views
+    ├── error.jade
+    ├── index.jade
+    └── layout.jade
+```
+
+### Fetch
+We can simulate GET and POST requests in Javascript using the `fetch()` function. The fetch request works by passing in the url for the data and an optional parameter containing headed data for the request being sent (i.e. authorisation tokens). Here is a simple GET request using the `fetch()` method:
+
+```javascript
+fetch("https://jsonplaceholder.typicode.com/posts/1")
+  .then((response) => response.json())
+  .then((json) => console.log(JSON.stringify(json)));
+```
+
+Here is a simple POST request using the `fetch()` method:
+
+```javascript
+const headerContent = {
+  method: "POST",
+  body: JSON.stringify({
+    title: "foo",
+    body: "bar",
+    userId: 1,
+  }),
+  headers: {
+    "Content-type": "application/json; charset=UTF-8",
+  },
+};
+
+fetch("https://jsonplaceholder.typicode.com/posts", headerContent)
+  .then((response) => response.json())
+  .then((json) => console.log(json));
+```
+
+### Promises
+A promise is a special Javascript object that can hold the future value of an asynchronous operation. A promise can be in one of three states at any given time:
+
+- Pending: This is the initiate state, it is neither fulfilled or rejected
+- Fulfilled: This state is true when the operation has been completed and the promise now contains the retrieved data
+- Rejected: This state is true when the operation has failed
+
+Promises work by chaining functions from each other using the keyword `.then()`. We can also use `.catch()` at the end of our chain to throwback any errors we retrieve. For example, let's say we want to print to the console the returned data if, and only if, the fetch request returns a valid response, without having to freeze our application waiting for the API callback. We can use promises for this as such:
+
+```javascript
+fetch("https://jsonplaceholder.typicode.com/posts/1")
+  .then((response) => {
+    if (response.ok) {
+      return response.json();
+    }
+
+    throw new Error("Failed network response");
+  })
+  .then((result) => {
+    console.log(result);
+  })
+  .catch((error) => console.log(`Problem with error message: ${error}`));
+```
+
+We can also use Async/Await to accomplish the same thing:
+
+```javascript
+{
+	() => {
+		try {
+			const response = await fetch('https://jsonplaceholder.typicode.com/posts/1')
+
+			if (!response.ok) {
+		    throw new Error('Failed network response');
+		  }
+
+			console.log(await response.json());
+		} catch (error) {
+			console.log(`Problem with error message: ${error}`);
+		}
+	}
+}
+```
