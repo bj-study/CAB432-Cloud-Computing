@@ -185,7 +185,7 @@ Hardware emulators are full or partial software implementations of the hardware 
 Para-virtualisation is a way of modifying the guest OS to make virtualisation easier. VMM does this by implementing an API for the guest OS or by simulating privileged instructions. The obvious pro to this method is that we can avoid the costly binary translations. The downsides to this is that we must modify the guest OS and we can no longer emulate incompatible instructions sets.
 
 ### Hardware Assisted Virtualisation
-Hardware assisted virtualisation is
+Hardware assisted virtualisation is a way of creating virtual versions of operating systems and physical desktops. Using a virtual machine manager, abstracted hardware can be presented to multiple guest operating systems all sharing the same physical hardware resources.
 
 There are many pros to this such as:
 - The guest OS can continue in a privileged kernel mode
