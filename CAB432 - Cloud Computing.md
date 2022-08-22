@@ -12,7 +12,7 @@ Associate Professor Jim Hogan | Notes for CAB432 at the Queensland University of
 		<li><a href="#week2">Week 2</a>: Docker</li>
 		<li><a href="#week3">Week 3</a>: Cloud Applications, REST, and Node</li>
 		<li><a href="#week4">Week 4</a>: Node and Express</li>
-		<li><a href="#week5">Week 5</a>: </li>
+		<li><a href="#week5">Week 5</a>: Storage and State</li>
 		<li><a href="#week6">Week 6</a>: </li>
 		<li><a href="#week7">Week 7</a>: </li>
 		<li><a href="#week8">Week 8</a>: </li>
@@ -299,7 +299,7 @@ Each request follows the general structure of:
 - Any subsequent headers e.g. Content-Type
 - An empty line above the data block
 
-Each request follows the general structure of:
+Each response follows the general structure of:
 - Status line, HTTP version used + the status code and information
 - Additional HTTP headers such as the timestamp, type, data size...
 - The data block (with a blank line above it)
@@ -508,3 +508,77 @@ We can also use Async/Await to accomplish the same thing:
 	}
 }
 ```
+
+<br />
+
+<h2 id="week5">Week 5: Storage and State</h2>
+
+### Persistance with Azure, Google, and AWS
+These three majors organise their offerings into three main categories:
+1. Cloud Storage: Large scale general purpose storage
+2. Databases: Databases of various kinds such as SQL, NoSQL and others
+3. Containers: Container services such as Kubernetes and others
+
+### Instance and Block Storage
+Instance and block storage both provision for IaaS instances and are best comparable to a disk drive, either internal or mounted. Instance storage should always been seen as ephemeral while block stores have the ability to persist independent of the instance.
+
+There are very minor and subtle differences in the offerings of instance vs block storage.
+
+### SQL Databases
+SQL databases are great for small-scale applications but where they fail is their scalability. In a small-scale application we can simply reserve an IaaS instance or use a local relational DB installed within the private network. However, when we use SQL databases at scale we must rely on vendor DB services which are scalable with managed redundancy.
+
+Advantages of using an SQL database:
+- Support for transactions and isolation levels
+- Well-defined schema that never changes
+- Complex queries and updates on the scheme
+- Predictable workload with a known upper limit
+- Very easy to report against
+
+Disadvantages of using an SQL database:
+- There is a known upper limit
+- Need stringent consistency requirements (ACID)
+- Once the schema is created it is very unlikely to update and evolve
+
+### ACID
+ACID is an acronym consisting of a set of guarantees that transactions should/must follow:
+- **Atomicity**: Transactions will work in an "all or nothing" mode with all effects either being committed or rolled back.
+- **Consistency**: All transactions must not violate consistency rules such as integrity constraints, foreign key constraints, value restrictions, not NULL, and more.
+- **Isolation**: Any transactions running concurrent to each other are not able to "see" or interact with each others effects, although this does depend on the isolation level.
+- **Durability**: Any effects due to a commit transaction are permanently stored and will fail over system outages.
+
+### NoSQL Databases
+NoSQL is an entity based storage usually storing key-value pairs with proprietary API. NoSQL databases are flexible due to the schemas ability to evolve with the service. A benefit to using NoSQL over SQl is that NoSQL can serve more requests by provisioning more hardware, this is very hard for SQL databases to do. NoSQL does not follow acid due to it's allowance of eventual consistency.
+
+### Blob Stores
+A blob, also known as a binary large object, is an large object of binary data that can be stored in databases. Blobs are usually used for storing images, large files, videos and audio, log files and more.
+
+### S3 - Simple Storage Service
+S3 is an object storing service designed on storing large objects. S3 follows a non-relational, addressable bucket model where data persistence is up to the vendor and data utility is up to you.
+
+### Shared In-Memory Caches
+Shared in-memory cache occurs when data is stored in the memory of a device. This type of storage is shared low-latency, in-memory persistance with its state being synchronised across instances. This type of storage has very fast access times and is critical for application KPIs.
+
+This type of storage is not for failover situations because there is no guarantee about what data is there.
+
+### Static Content Distribution Services (CDN)
+A CDN is a network of interconnected services designed at speeding up the loading of data-heavy webpage applications. A CDN stores the contents of a website in a closer geographical location to the user to speed up the connection speed.
+
+A static CDN frequently serves static content that is designed to never change, This means that the served content is read only and cannot be modified in a normal operation.
+
+### Stateless Applications
+In a stateless application the server must not retain any local, unrecoverable resources. We're not able to rely on transient state, state held in memory or persistent network connections, between service calls. 
+
+However, we do need some way of being able to pass state around the application. To do this we can generally hold state in an external service between service invocations such as in a DB or in-memory cache shared by all server instances.
+
+We try to use statelessness in a scalable cloud environment for a couple reasons:
+1. **Simplicity**: Applications do not need to preserve the state of the first service invocation for any subsequent invocations. This allows the service invocations to be independent of each other.
+2. **Scalability**: Due to these service invocations being independent of each other the infrastructure can be exchanged at any point in time.
+3. **Robustness**: In the occurrence of an instance failure, no transient state is lost. A restarting instance can "fail over" and still recover from the persisted state.
+
+The state for later service invocations must be able to be shared across cloud application server instances. This can be done by using a joint underlying storage service as a state synchronisation mechanism. Storage services are a way of providing consistent data synchronisation mechanics that are hidden from the application programmer. It's important to remember that shared state may also be transient, non-persistent.
+
+### Statelessness Limitations
+Although statelessness can be a blessing it also unfortunately has some pitfalls:
+- **Legacy Applications**: Any existing legacy code bases may compromise components which hold state across server invocations.
+- **Persistent Connections**: Asynchronous "push-based" server-to-client communications are often based on persistent connections. This setup generally sees clients maintaining a connection to the server to receive push events with low latency.
+- **Low-latency Applications**: In some application scenarios needing a very high performance set of requirements, a stateful design is actually preferred.
