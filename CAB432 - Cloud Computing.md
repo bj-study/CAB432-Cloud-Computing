@@ -13,7 +13,7 @@ Associate Professor Jim Hogan | Notes for CAB432 at the Queensland University of
 		<li><a href="#week3">Week 3</a>: Cloud Applications, REST, and Node</li>
 		<li><a href="#week4">Week 4</a>: Node and Express</li>
 		<li><a href="#week5">Week 5</a>: Storage and State</li>
-		<li><a href="#week6">Week 6</a>: </li>
+		<li><a href="#week6">Week 6</a>: Persistence</li>
 		<li><a href="#week7">Week 7</a>: </li>
 		<li><a href="#week8">Week 8</a>: </li>
 		<li><a href="#week9">Week 9</a>: </li>
@@ -582,3 +582,76 @@ Although statelessness can be a blessing it also unfortunately has some pitfalls
 - **Legacy Applications**: Any existing legacy code bases may compromise components which hold state across server invocations.
 - **Persistent Connections**: Asynchronous "push-based" server-to-client communications are often based on persistent connections. This setup generally sees clients maintaining a connection to the server to receive push events with low latency.
 - **Low-latency Applications**: In some application scenarios needing a very high performance set of requirements, a stateful design is actually preferred.
+
+<br />
+
+<h2 id="week5">Week 6: Persistence</h2>
+
+### Stateful Legacy Applications
+Legacy applications are often based on dated code bases. These older architectures were often built to fixed "sizing" guidelines with an upper bound on the anticipated load. There was no need to "elastically" scale outwards.
+
+These architectures were also built in a controlled environment with old style computing resources and usage patterns. There was hardly any virtualisation but infrequent hardware migration. These were often easier to scale up rather than scale out.
+
+### Persistent Connections
+Persistent connections are a way of providing asynchronous server-to-client communications. With a persistent connection, a client can retain a connection to a server on which it will progressively and asynchronously receive updates.
+
+The server instance holds state for the persistent HTTP connection (long polling and server-sent events) or WebSocket connection.
+
+### Why is Statefulness a Problem?
+Statefulness is a problem when dealing with a cloud architecture as it introduces singleton application components. These singletons hold specific data which is not shared across other instances. 
+
+This becomes a problem if some error or system outage occurs as this data becomes unrecoverable. A crash of a singleton application component instance will result in a loss of the exclusively held state. 
+
+There is also the case of multiple clients holding persistent connections where they will eventually have to reconnect and they may not be routed to the same instance they had before.
+
+### Dealing with Statefulness
+There are a few options when dealing with statefulness:
+- Re-engineer the application to be stateless
+- Use a distributed in-memory cache layered on top of a stateless design
+- Introduce "session stickiness" to correctly route requests to the same "singleton recourse"
+- Embrace an event-driven architecture using a message-oriented middleware
+- Use platform services for asynchronous, push-based client communication
+
+### Session Stickiness
+Session stickiness is a way of using the load balancer to route requests relating to the same state to the same app server instance. It does this by introducing a client session concept using services such as HTTP cookers, HTTP header data, and more to tag semantically cohesive service invocations.
+
+This however breaks the architecture principle of "separation of concerns" introducing a new dependency on correct load balancer behaviour.
+
+### Event-driven Architecture
+Event-driven architecture is a way of using a message-oriented middleware to provide asynchronous, queue-based decoupling of application components. Event-driven architecture follows a publish-subscribe based programming model.
+
+### Push Notifications
+Using PaaS and persistent connections we can provide asynchronous, push-based client notifications.
+
+### Relational Databases
+Relational databases are a way of storing data in a structured way through the use of tables (relations) comprising of rows (tuples).
+
+Application developers define a schema, a set of table definitions with optional constraints, for the database to follow. Each table in a relational database should be normalised:
+- 1NF: All attributes are atomic
+- 2NF: Each non-key attribute is functionally dependent on whole primary key
+- 3NF: No non-key attributes are functionally dependent on other non-key attributes
+
+One of the issues with relational databases in the cloud is that their not designed to scale. There are two main ways of using relational databases in the cloud:
+1. Replication: Storing the same data on multiple nodes
+2. Sharding/Partitioning: Tables are split, horizontally into shards or vertically into column sets, across multiple nodes.
+
+Both of these techniques however have their own problems. RDBMS often struggle on the cloud:
+- The normalised relational data model implies that queries/updates "touch" multiple tables which could possibly reside on different nodes
+- The stringent consistency requirements of ACID implies that updates be visible on all affected nodes and in all replicas
+
+### Structured Query Language (SQL)
+RDBMS predominantly use SQL to retrieve, create, delete and modify data from a database. SQL supports clean layering of applications on top of a data storage layer and, in principle, allow migrating applications between different RDBMS.
+
+Querying a normalised schema typically requires joining multiple tables to satisfy the query expression.
+
+### The CAP Theorem
+The CAP theorem, created by Brewer, formalises limitations of scalable, distributed databases via:
+- Consistency: When a first transaction changes some data on a first node, a subsequent transaction running on a second node will be able to see the changed data.
+- Availability: Each transaction issued on a node is always answered with a "successful" or "failed" message.
+- Partition tolerance: The distributed database system must continue working, even if a single node drops out or communication to other nodes is interrupted.
+
+Databases can only ever support a maximum of two out of three CAP criteria.
+
+When to choose CP vs AP?:
+- CP (Sacrifices availability): All operations are strongly consistent, despite network partitions (failures)
+- AP (Sacrifices consistency): All operations are carried out, despite "network partitions"
