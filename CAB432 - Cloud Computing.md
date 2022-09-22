@@ -14,8 +14,8 @@ Associate Professor Jim Hogan | Notes for CAB432 at the Queensland University of
 		<li><a href="#week4">Week 4</a>: Node and Express</li>
 		<li><a href="#week5">Week 5</a>: Storage and State</li>
 		<li><a href="#week6">Week 6</a>: Persistence</li>
-		<li><a href="#week7">Week 7</a>: </li>
-		<li><a href="#week8">Week 8</a>: </li>
+		<li><a href="#week7">Week 7</a>: Scaling</li>
+		<li><a href="#week8">Week 8</a>: Persistence and Security</li>
 		<li><a href="#week9">Week 9</a>: </li>
 		<li><a href="#week10">Week 10</a>: </li>
 		<li><a href="#week11">Week 11</a>: </li>
@@ -25,7 +25,7 @@ Associate Professor Jim Hogan | Notes for CAB432 at the Queensland University of
 </ul>
 
 <hr /> 
-
+Scaling
 <h1 id="CAB432">CAB432: Cloud Computing</h1>
 <p>Cloud Computing is among the most important developments in the IT industry in recent years, and one which has received enormous attention. Cloud is a natural progression from earlier trends in service and infrastructure outsourcing and virtualisation, but is distinguished by its elasticity and scale: service and infrastructure provisioning may change rapidly in response to variations in demand, allowing clients to cater for unexpected spikes in load without tying up capital in expensive and potentially underutilised assets. Cloud services and technologies are becoming increasingly diverse and sophisticated, moving rapidly from the original 'bare metal' offerings and providing a rich set of options and APIs. This unit provides a technically oriented introduction to Cloud Computing, giving you experience in developing modern cloud applications and deploying them to the public clouds of the major vendors.</p>
 
@@ -655,3 +655,47 @@ Databases can only ever support a maximum of two out of three CAP criteria.
 When to choose CP vs AP?:
 - CP (Sacrifices availability): All operations are strongly consistent, despite network partitions (failures)
 - AP (Sacrifices consistency): All operations are carried out, despite "network partitions"
+
+<hr /> 
+
+<h2 id="week7">Week 7: Scaling</h2>
+
+### Scaling
+The concept of scaling isn't a complicated one. At its core we want to:
+- Scale out as the load increases
+- Scale in as the load decreases
+
+There are however, three distinct approaches to achieving this:
+- **Manual Scaling**: Manually scaling the application by adding or removing instances via the console or command line
+- **Scheduled Scaling**: The application developer schedules the scaling of the application at defined times based on the knowledge of common load patterns
+- **Dynamic Scaling**: Responds automatically according to the current detected load, based on a set of scaling rules.
+
+### Auto Scaling Groups (AWS)
+An auto scaling group is a collection of EC2 instances that can be thought of as a logical unit for scaling and management purposes.
+
+**Creating an Auto Scaling Group**:
+1. Create a virtual machine Instance
+2. Capture an AMI from this instance
+    -  This will specify identical worker machines and capture the OS + software stack.
+3. Create a launch configuration
+    -  This will be based on the AMI and will support the creation of new instances with specific storage, network and security settings.
+4. Create one or more target groups
+    -  These will specify where the load balanced traffic will be directed to.
+5. Create an application load balancer
+    -  This will be used to direct requests to the target groups.
+6. Create an auto scaling group of machine instances
+
+### Launch Configurations (AWS)
+Auto scaling requires a cookie cutter approach when creating compute instances. This cookie cutter approach can be achieved through the use of launch configurations. In AWS these launch configurations consist of:
+- Amazon Machine Image (AMI)
+- Instance type
+- Key pair
+- Security group(s)
+- Block device mapping
+
+### Target Groups and The Application 
+A target group is used to specify where the load balanced traffic will be directed to. This could be an EC2 instance, Lambdas, fixed IP addresses, or more. The application load balancer will direct traffic to the target groups and allow the use of application structure to direct requests. The application load balancer operates at the application layer.
+
+<hr /> 
+
+<h2 id="week8">Week 8: Persistence and Security</h2>
