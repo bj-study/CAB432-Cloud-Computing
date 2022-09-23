@@ -17,7 +17,7 @@ Associate Professor Jim Hogan | Notes for CAB432 at the Queensland University of
 		<li><a href="#week7">Week 7</a>: Scaling</li>
 		<li><a href="#week8">Week 8</a>: Persistence and Security</li>
 		<li><a href="#week9">Week 9</a>: </li>
-		<li><a href="#week10">Week 10</a>: </li>
+		<li><a href="#week10">Week 10</a>: Serverless</li>
 		<li><a href="#week11">Week 11</a>: </li>
 		<li><a href="#week12">Week 12</a>: </li>
 		<li><a href="#week13">Week 13</a>: </li>
@@ -699,3 +699,66 @@ A target group is used to specify where the load balanced traffic will be direct
 <hr /> 
 
 <h2 id="week8">Week 8: Persistence and Security</h2>
+
+### Eventual Consistency
+ACID states that any successful update is visible immediately to transactions querying the updated table regardless of the node on which the transactions are processed. However, with eventual consistency, a successful update will only be immediately visible on the local database node. Other database nodes will eventually and asynchronously converge to the same state some time later.
+
+There are a variety of eventual consistency protocols:
+1. Operational Transformation (OT)
+2. Vector Clocks
+3. Manual merging of deviating versions
+
+<hr />
+
+<h2 id="week9">Week 9: Serverless</h2>
+
+### Serverless
+Serverless is a cloud computing execution model where the cloud provider dynamically manages the allocation and provisioning of servers. It's a way to describe services that allow you to build and run applications without the need to think about servers. 
+
+In a serverless architecture:
+- There is no infrastructure to provision, manage, or upgrade
+- There is automatic scaling based on the load
+- Integrated monitoring, logging, and debugging capabilities
+- Built-in security at role and per function level based on the principle of least privilege
+
+| Compute | Containers | Integration | Storage | Database |
+| --- | --- | --- | --- | --- |
+| Lambda | Fargate | Queues | Object | DynamoDB |
+| Functions | Container Instances | Notification | | Cloud SQL |
+| Workers | Cloud Run | Synchronisation | | Cloud Spanner |
+
+### Serverless vs Containers
+- Scalability:
+  - In a container-based architecture, the number of containers deployed is generally determined in advance.
+  - In a serverless architecture, the backend inherently and automatically scales to meet the needed demand.
+- Cost:
+  - Containers are constantly running.
+  - Code (serverless) on the other hand only runs when it is called or needed.
+- Maintenance:
+  - Containers are hosted int he cloud, but cloud providers do not update or maintain them. That responsibility is left up to you.
+  - Serverless on the other hand has no backend to manage.
+
+### Microservices
+Microservice architecture, or microservices, is a method of developing software systems where each single-functioned module operates with well-defined interfaces and operations. These microservices are typically implemented through RESTful APIs such as CRUD (Create, Read, Update, Delete) operations or Verbs (GET, POST, PUT, DELETE).
+
+**Microservice Attributes**:
+- Highly maintainable and testable
+- Loosely coupled
+- Independently deployable
+- Organised around business capabilities
+- Owned by a small team
+
+### Avoiding Common Mistakes
+- If the deployment package is greater than 50mb, it should be broken down into smaller packages.
+- If the requests payload exceeded the serverless limit, it should be broken down into smaller request endpoints.
+- If the code is being run for hours, it should be moved to a container or server.
+
+### Serverless Use Cases
+- Operating serverless websites
+- Rapid document conversions
+- Predictive page rendering
+- Working with external services
+- Log analysis on the fly
+- Automated backups and everyday tasks
+- Processing uploaded objects
+- Bulk real-time data processing
